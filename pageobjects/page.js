@@ -6,7 +6,7 @@ import Wall from './fragments/wall.js';
  */
 class Page {
     /**
-     * Получает доступ боковоу меню страницы.
+     * Получает доступ к боковоу меню страницы.
      * @returns {SideBarMenu} Экземпляр бокового меню.
      */
     get sideBarMenu() {
