@@ -128,3 +128,17 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+package-lock.json
+
+.vscode/
+.idea/
+
+*.png
+!post_photo.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+allure-results/
