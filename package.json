@@ -1,0 +1,32 @@
+{
+  "name": "vk",
+  "version": "1.0.0",
+  "description": "Автотест для web-приложения \"Вконтакте\"",
+  "main": "index.js",
+  "scripts": {
+    "wdio": "wdio run ./wdio.conf.js"
+  },
+  "keywords": [],
+  "author": "Игорь Симонов",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@wdio/cli": "^8.35.1",
+    "@wdio/globals": "^8.36.1",
+    "chai": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "form-data": "^4.0.0",
+    "form-data-encoder": "^4.0.2",
+    "formdata-node": "^6.0.3",
+    "node-fetch": "^3.3.2",
+    "resemblejs": "^5.0.0",
+    "webdriverio": "^8.35.1"
+  },
+  "devDependencies": {
+    "@wdio/allure-reporter": "^8.34.0",
+    "@wdio/local-runner": "^8.35.1",
+    "@wdio/mocha-framework": "^8.35.0",
+    "@wdio/spec-reporter": "^8.32.4",
+    "mocha": "^10.4.0"
+  }
+}
