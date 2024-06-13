@@ -147,7 +147,7 @@ wdio run ./wdio.conf.js
 │   ├── page.js               # Общая страница
 │   ├── newsPage.js           # Страница новостей
 │   ├── profilePage.js        # Страница профиля
-│   └── fragments/            # Фрагменты страницы
+│   └── elements/            # Фрагменты страницы
 │       ├── comment.js        # Комментарий поста
 │       ├── post.js           # Пост
 │       ├── sideBarMenu.js    # Боковое меню

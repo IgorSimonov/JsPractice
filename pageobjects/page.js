@@ -1,5 +1,5 @@
-import SideBarMenu from './fragments/sideBarMenu.js';
-import Wall from './fragments/wall.js';
+import SideBarMenu from './elements/sideBarMenu.js';
+import Wall from './elements/wall.js';
 
 /**
  * Страница.

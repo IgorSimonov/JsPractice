@@ -1,9 +1,12 @@
-import Page from './page.js';
+import baseWithSideBarMenuPage from "./baseWithSideBarMenuPage.js";
 
 /**
  * Страница Новости.
  */
-class NewsPage extends Page {
+class NewsPage extends baseWithSideBarMenuPage {
+    constructor() {
+        super('Новости');
+    }
 }
 
-export default new NewsPage();
+export default NewsPage;

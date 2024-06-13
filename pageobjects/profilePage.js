@@ -1,9 +1,12 @@
-import Page from './page.js';
+import baseWithWallPage from "./baseWithWallPage.js";
 
 /**
  * Страница профиля.
  */
-class ProfilePage extends Page {
+class ProfilePage extends baseWithWallPage {
+    constructor() {
+        super('Страница профиля');
+    }
 }
 
-export default new ProfilePage();
+export default ProfilePage;

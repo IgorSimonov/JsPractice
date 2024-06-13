@@ -1,13 +1,12 @@
+import BaseElement from "../../framework/elements/baseElement.js";
+
 /**
  * Комментарий поста.
  */
-class Comment {
-    /**
-     * Создает новый экземпляр комментария.
-     * @param {WebdriverIO.Element} element - Элемент, представляющий комментарий.
-     */
-    constructor(element) {
-        this.element = element;
+class Comment extends BaseElement {
+
+    constructor() {
+        super()
     }
 
     /**

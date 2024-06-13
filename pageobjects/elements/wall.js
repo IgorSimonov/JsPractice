@@ -1,12 +1,12 @@
 import Post from './post.js';
-import { $ } from '@wdio/globals';
+import BaseElement from "../../framework/elements/baseElement.js";
 
 /**
- * Класс, представляющий стену.
+ * Стена.
  */
-class Wall {
+class Wall extends BaseElement {
     constructor() {
-        this.wallSelector = '.wall_module';
+        super('#page_wall_posts', 'Стена');
     }
 
     /**
@@ -14,7 +14,7 @@ class Wall {
      * @param {number} [timeout=10000] - Время ожидания в миллисекундах.
      * @returns {Promise<void>}
      * @throws {Error} Если стена не отображается за указанное время.
-     */
+
     async waitForWallDisplayed(timeout = 10000) {
         try {
             await $(this.wallSelector).waitForDisplayed({
@@ -25,6 +25,7 @@ class Wall {
             throw new Error(`Ошибка при ожидании отображения стены: ${error.message}`);
         }
     }
+     */
 
     /**
      * Получает пост по заданному идентификатору.
@@ -33,13 +34,8 @@ class Wall {
      * @throws {Error} Если пост не найден.
      */
     async getPost(postId) {
-        try {
-            const postElement = await $(`${this.wallSelector} div[id*="${postId}"]`);
-            return new Post(postElement);
-        } catch (error) {
-            throw new Error(`Не удалось найти пост с ID ${postId}: ${error.message}`);
-        }
+        return  new Post(`div[id*="${postId}"]`, this);
     }
 }
 
-export default new Wall();
+export default Wall;

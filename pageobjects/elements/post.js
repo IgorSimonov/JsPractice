@@ -1,24 +1,13 @@
 import Comment from './comment.js';
 import { browser } from '@wdio/globals';
+import BaseElement from "../../framework/elements/baseElement.js";
 
 /**
  * Пост на стене.
  */
-class Post {
-    /**
-     * Создает новый экземпляр поста.
-     * @param {WebdriverIO.Element} element - Элемент, представляющий пост.
-     */
-    constructor(element) {
-        this.element = element;
-    }
-
-    /**
-     * Получает текст поста.
-     * @returns {Promise<string>} Текст поста.
-     */
-    async getText() {
-        return await this.element.$('.wall_post_text').getText();
+class Post extends BaseElement {
+    constructor(locator, parent = null) {
+        super(locator, '', parent);
     }
 
     /**
@@ -27,11 +16,11 @@ class Post {
      */
     async getAuthor() {
         // Попытка получить автора поста, если пост не новый.
-        let attribute = await this.element.getAttribute('data-post-author-id');
+        let attribute = await (await this._find()).getAttribute('data-post-author-id');
 
         if (!attribute) {
             // Если пост только что добавлен, пытаемя получить id из ссылки.
-            let hrefValue = await this.element.$('a.AvatarRich').getAttribute('href');
+            let hrefValue = await (await this._find()).$('a.AvatarRich').getAttribute('href');
             attribute = hrefValue.replace('/id', '');
         }
 
@@ -43,7 +32,7 @@ class Post {
      * @returns {Promise<void>}
      */
     async clickLike() {
-        await this.element.$('.PostBottomActionContainer.PostButtonReactionsContainer').click();
+        await (await this._find()).$('.PostBottomActionContainer.PostButtonReactionsContainer').click();
 
         // Ожидание, чтобы после клика, в ответ API попал поставленый лайк.
         await browser.pause(1000);
