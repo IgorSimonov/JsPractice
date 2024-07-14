@@ -147,7 +147,7 @@ wdio run ./wdio.conf.js
 │   ├── page.js               # Общая страница
 │   ├── newsPage.js           # Страница новостей
 │   ├── profilePage.js        # Страница профиля
-│   └── fragments/            # Фрагменты страницы
+│   └── elements/            # Фрагменты страницы
 │       ├── comment.js        # Комментарий поста
 │       ├── post.js           # Пост
 │       ├── sideBarMenu.js    # Боковое меню
@@ -156,7 +156,7 @@ wdio run ./wdio.conf.js
 │   └── spec/                 # Файлы спецификации тестов
 │       └── test.js           # Тестовый файл
 ├── utils/                    # Утилиты
-│   ├── common.js             # Общие утилиты
+│   ├── compareUtils.js             # Общие утилиты
 │   └── vkApi.js              # Библиотека для работы с API VK
 ├── config.js                 # Конфигурационные настройки проекта
 └── wdio.conf.js              # Конфигурационный файл для WebDriverIO
