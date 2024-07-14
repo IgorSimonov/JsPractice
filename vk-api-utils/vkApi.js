@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import { FormData } from 'formdata-node';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
+import API_ENDPOINTS from "./endpoints.js";
 
 const API_BASE_URL = 'https://api.vk.com/method/';
 const API_VERSION = '5.131';
@@ -11,7 +12,10 @@ const API_VERSION = '5.131';
  * загрузки файлов, получения списка лайков и других операций.
  */
 class VkApi {
-    /** @type {string} Токен доступа для API ВКонтакте. */
+    /**
+     * Токен доступа для API ВКонтакте.
+     * @type {string}
+     */
     #accessToken;
 
     /**
@@ -20,7 +24,7 @@ class VkApi {
      */
     constructor(accessToken) {
         if (typeof accessToken !== 'string') {
-            throw new Error('Токен доступа должен быть строкой');
+            throw new Error('Токен доступа должен быть строкой!');
         }
 
         this.#accessToken = accessToken;
@@ -38,7 +42,7 @@ class VkApi {
             message: message,
         };
 
-        return await this.#request('wall.post', params);
+        return await this.#request(API_ENDPOINTS.WALL.POST, params);
     }
 
     /**
@@ -51,12 +55,13 @@ class VkApi {
      */
     async editWall(ownerId, attachments, postId, message) {
         const params = {
+            owner_id: ownerId,
             attachments: attachments,
             post_id: postId,
             message: message,
         };
 
-        return await this.#request('wall.edit', params);
+        return await this.#request(API_ENDPOINTS.WALL.EDIT, params);
     }
 
     /**
@@ -69,7 +74,7 @@ class VkApi {
             post_id: postId,
         };
 
-        return await this.#request('wall.delete', params);
+        return await this.#request(API_ENDPOINTS.WALL.DELETE, params);
     }
 
     /**
@@ -84,13 +89,13 @@ class VkApi {
             message: message,
         };
 
-        return await this.#request('wall.createComment', params);
+        return await this.#request(API_ENDPOINTS.WALL.CREATE_COMMENT, params);
     }
 
     /**
      * Получает список лайков для поста.
      * @param {string | number} postId - ID поста.
-     * @returns {Promise<Object>} Ответ API с информацией о лайках.
+     * @returns {Promise<Object>} Ответ API.
      */
     async getPostLikes(postId) {
         const params = {
@@ -98,25 +103,26 @@ class VkApi {
             item_id: postId,
         };
 
-        return await this.#request('likes.getList', params, 'GET');
+        return await this.#request(API_ENDPOINTS.LIKES.GET_LIST, params, 'GET');
     }
 
     /**
      * Редактирует пост на стене с загруженной фотографией.
      * @param {string} photoPath - Путь к фотографии.
+     * @param {string | number} ownerId - ID владельца стены.
      * @param {string | number} postId - ID поста.
      * @param {string | number} message - Новое сообщение.
      * @returns {Promise<Object>} Ответ API.
      * @throws Ошибка при редактировании поста.
      */
-    async editWallPostWithUploadedPhoto(photoPath, postId, message) {
+    async editWallPostWithUploadedPhoto(photoPath, ownerId, postId, message) {
         try {
             const wallUploadServerResponse = await this.getWallUploadServer();
             const uploadFileResponse = await this.uploadFile(wallUploadServerResponse.response.upload_url, photoPath);
             const saveWallPhotoResponse = await this.saveWallPhoto(uploadFileResponse.server, uploadFileResponse.photo, uploadFileResponse.hash);
 
             return await this.editWall(
-                postId,
+                ownerId,
                 `photo${saveWallPhotoResponse.response[0].owner_id}_${saveWallPhotoResponse.response[0].id}`,
                 postId,
                 message,
@@ -133,7 +139,7 @@ class VkApi {
     async getWallUploadServer() {
         const params = {};
 
-        return await this.#request('photos.getWallUploadServer', params, 'GET');
+        return await this.#request(API_ENDPOINTS.PHOTOS.GET_WALL_UPLOAD_SERVER, params, 'GET');
     }
 
     /**
@@ -150,7 +156,7 @@ class VkApi {
             hash: hash,
         };
 
-        return await this.#request('photos.saveWallPhoto', params);
+        return await this.#request(API_ENDPOINTS.PHOTOS.SAVE_WALL_PHOTO, params);
     }
 
     /**
@@ -158,11 +164,11 @@ class VkApi {
      * @param {string} url - URL для загрузки файла.
      * @param {string} pathToFile - Путь к файлу для загрузки.
      * @returns {Promise<Object>} Ответ сервера загрузки.
-     * @throws Ошибка при загрузке файла.
+     * @throws {Error} Ошибка при загрузке файла.
      */
     async uploadFile(url, pathToFile) {
         const form = new FormData();
-        form.set('photo', await fileFromPathSync(pathToFile));
+        form.set('photo', fileFromPathSync(pathToFile));
 
         try {
             const response = await fetch(url, {
@@ -171,12 +177,12 @@ class VkApi {
             });
 
             if (!response.ok) {
-                throw new Error(`Ошибка загрузки файла! Статус: ${response.status}`);
+                throw new Error(`Ошибка загрузки файла! Статус: ${response.status}!`);
             }
 
             return await response.json();
         } catch (error) {
-            throw new Error(`Ошибка при загрузке файла: ${error.message}`);
+            throw new Error(`Ошибка при загрузке файла: ${error.message}!`);
         }
     }
 
@@ -186,7 +192,6 @@ class VkApi {
      * @param {Object} params - Параметры запроса.
      * @param {string} [method='POST'] - Метод HTTP запроса.
      * @returns {Promise<Object>} Ответ API.
-     * @throws Ошибка при некорректном ответе HTTP или ошибке API ВКонтакте.
      */
     async #request(endpoint, params, method = 'POST') {
         params.access_token = this.#accessToken;
@@ -209,18 +214,7 @@ class VkApi {
         }
 
         const response = await fetch(url, options);
-
-        if (!response.ok) {
-            throw new Error(`Ошибка HTTP! Статус: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.error) {
-            throw new Error(`Ошибка API ВКонтакте: ${data.error.error_msg}`);
-        }
-
-        return data;
+        return await response.json();
     }
 }
 

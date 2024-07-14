@@ -1,13 +1,73 @@
 import Comment from './comment.js';
-import { browser } from '@wdio/globals';
 import BaseElement from "../../framework/elements/baseElement.js";
+import Label from "../../framework/elements/label.js";
+import Button from "../../framework/elements/button.js";
+import common from "../../utils/common.js";
 
 /**
  * Пост на стене.
  */
 class Post extends BaseElement {
-    constructor(locator, parent = null) {
-        super(locator, '', parent);
+    /**
+     * Поле с текстом поста.
+     * @type {Label}
+     */
+    #textLabel = new Label('.wall_post_text', 'Текст поста', this);
+
+    /**
+     * Поле с аватаром автора поста.
+     * @type {Label}
+     */
+    #avatarLabel = new Label('a.AvatarRich.PostHeader__avatar', 'Аватар автора поста', this);
+
+    /**
+     * Поле с фотографией поста.
+     * @type {Label}
+     */
+    #photoLabel = new Label('a.page_post_thumb_wrap', 'Фото поста', this);
+
+    /**
+     * Кнопка "Показать следующие комментарии".
+     * @type {Button}
+     */
+    #showNextCommentButton = new Button('.js-replies_next_label', 'Показать следующие комментарии', this);
+
+    /**
+     * Кнопка "Лайк".
+     * @type {Button}
+     */
+    #likeButton = new Button('.PostBottomAction.PostBottomAction--withBg.PostButtonReactions.PostButtonReactions--post.PostBottomAction--empty',
+        'Кнопка "Лайк"', this);
+
+    /**
+     * Кнопка "Убрать лайк".
+     * @type {Button}
+     */
+    #unlikeButton = new Button('.PostBottomAction.PostBottomAction--withBg.PostButtonReactions.PostButtonReactions--post.PostButtonReactions--icon-active.PostButtonReactions--active',
+        'Кнопка "Убрать лайк"', this);
+
+    /**
+     * Кнопка "Комментарии".
+     * @type {Button}
+     */
+    #showCommentsButton = new Button('.PostBottomAction.PostBottomAction--withBg.comment._comment._reply_wrap',
+        'Кнопка "Комментарии"', this)
+
+    /**
+     * Создает экземпляр Post.
+     * @param {string} locator - Локатор поста.
+     * @param {BaseElement} parent - Родительский элемент, если есть.
+     */
+    constructor(locator, parent) {
+        super(locator, 'Пост', parent);
+    }
+
+    /**
+     * Получает текст.
+     * @returns {Promise<string>} Текст.
+     */
+    async getText() {
+        return await this.#textLabel.getText();
     }
 
     /**
@@ -15,16 +75,8 @@ class Post extends BaseElement {
      * @returns {Promise<string|null>} Идентификатор автора или null, если идентификатор не найден.
      */
     async getAuthor() {
-        // Попытка получить автора поста, если пост не новый.
-        let attribute = await (await this._find()).getAttribute('data-post-author-id');
-
-        if (!attribute) {
-            // Если пост только что добавлен, пытаемя получить id из ссылки.
-            let hrefValue = await (await this._find()).$('a.AvatarRich').getAttribute('href');
-            attribute = hrefValue.replace('/id', '');
-        }
-
-        return attribute;
+        let hrefValue = await this.#avatarLabel.getAttribute('href');
+        return common.removeIdFromString(hrefValue)
     }
 
     /**
@@ -32,10 +84,15 @@ class Post extends BaseElement {
      * @returns {Promise<void>}
      */
     async clickLike() {
-        await (await this._find()).$('.PostBottomActionContainer.PostButtonReactionsContainer').click();
+        await this.#likeButton.click();
+    }
 
-        // Ожидание, чтобы после клика, в ответ API попал поставленый лайк.
-        await browser.pause(1000);
+    /**
+     * Ожидает, пока кнопка "Убрать лайк" не будет отображена.
+     * @returns {Promise<void>}
+     */
+    async waitForUnlikeDisplayed() {
+        await this.#unlikeButton.waitForElementDisplayed();
     }
 
     /**
@@ -43,23 +100,38 @@ class Post extends BaseElement {
      * @returns {Promise<Comment[]>} Комментарии к посту.
      */
     async getComments() {
-        const nextComments = await this.element.$('.js-replies_next_label.replies_next_label');
-
-        // Ждем, пока кнопка "следующие комментарии" станет доступной.
-        await browser.pause(1000);
-
-        if (await nextComments.isExisting()) {
-            await nextComments.click();
-
-            // Ждем появления комментариев.
-            await browser.pause(1000);
-        }
-
-        const replyElements = await this.element.$$('.replies div[id*="post"]');
-        const comments = await Promise.all(await replyElements
-            .map(async (element) => new Comment(element)));
+        const replyElements = await (await this._find()).$$('.replies div[id*="post"]');
+        const comments = await replyElements.map(async (element) => {
+            const id = await element.getAttribute('id');
+            return new Comment(`.replies div[id=${id}]`, this);
+        });
 
         return comments;
+    }
+
+    /**
+     * Ожидает, пока кнопка "Показать следующие комментарии" не будет отображена.
+     * @returns {Promise<void>}
+     */
+    async waitForShowNextCommentButtonDisplayed() {
+        await this.#showNextCommentButton.waitForElementDisplayed();
+    }
+
+    /**
+     * Нажимает на кнопку "Показать следующие комментарии".
+     * @returns {Promise<void>}
+     */
+    async showNextCommentButtonClick() {
+        await this.#showNextCommentButton.click()
+    }
+
+    /**
+     * Ожидает, пока кнопка "Показать следующие комментарии" не исчезнет.
+     * @returns {Promise<void>}
+     */
+    async waitForShowNextCommentButtonHidden() {
+        await this.#showCommentsButton.click();
+        await this.#showNextCommentButton.waitForElementHidden();
     }
 
     /**
@@ -68,11 +140,7 @@ class Post extends BaseElement {
      * @returns {Promise<void>}
      */
     async saveScreenPhoto(pathToSave) {
-        let postPhoto = await this.element.$('a[aria-label="photo"]');
-
-        if (await postPhoto.isExisting()){
-            await postPhoto.saveScreenshot(pathToSave);
-        }
+        await this.#photoLabel.saveScreen(pathToSave);
     }
 }
 

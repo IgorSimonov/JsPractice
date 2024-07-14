@@ -8,19 +8,10 @@ class Label extends BaseElement {
      * Создает экземпляр Label.
      * @param {string} locator - Локатор элемента.
      * @param {string} name - Имя элемента.
-     * @param {BaseElement} [parent=null] - Родительский элемент, если есть.
+     * @param {BaseElement} parent - Родительский элемент, если есть.
      */
-    constructor(locator, name, parent = null) {
+    constructor(locator, name, parent) {
         super(locator, name, parent);
-    }
-
-    /**
-     * Получает текст.
-     * @returns {Promise<string>} Текст.
-     */
-    async getText() {
-        const element = await this._find();
-        return await element.getText();
     }
 }
 

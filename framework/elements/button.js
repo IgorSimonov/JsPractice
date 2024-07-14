@@ -8,9 +8,9 @@ class Button extends BaseElement {
      * Создает экземпляр Button.
      * @param {string} locator - Локатор элемента.
      * @param {string} name - Имя элемента.
-     * @param {BaseElement} [parent=null] - Родительский элемент, если есть.
+     * @param {BaseElement} parent - Родительский элемент, если есть.
      */
-    constructor(locator, name, parent = null) {
+    constructor(locator, name, parent) {
         super(locator, name, parent);
     }
 

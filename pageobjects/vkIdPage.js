@@ -18,6 +18,9 @@ class VkIdPage extends BasePage {
      */
     #continueButton = new Button('button[type=submit]', 'Кнопка "Продолжить"');
 
+    /**
+     * Создает экземпляр VkIdPage.
+     */
     constructor() {
         super('VK ID');
     }

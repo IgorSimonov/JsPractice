@@ -11,6 +11,10 @@ class BaseWithSideBarMenuPage extends BasePage {
      */
     sideBarMenu = new SideBarMenu();
 
+    /**
+     * Создает экземпляр BaseWithSideBarMenuPage.
+     * @param {string} name - Имя страницы.
+     */
     constructor(name) {
         super(name);
     }

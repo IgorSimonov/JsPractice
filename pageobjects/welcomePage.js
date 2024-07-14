@@ -10,14 +10,17 @@ class WelcomePage extends BasePage {
      * Поле ввода логина.
      * @type {TextBox}
      */
-    loginTextBox = new TextBox('#index_email', 'Поле ввода логина');
+    #loginTextBox = new TextBox('#index_email', 'Поле ввода логина');
 
     /**
      * Кнопка "Войти".
      * @type {Button}
      */
-    signInButton = new Button('button.VkIdForm__signInButton', 'Кнопка "Войти"');
+    #signInButton = new Button('button.VkIdForm__signInButton', 'Кнопка "Войти"');
 
+    /**
+     * Создает экземпляр WelcomePage.
+     */
     constructor() {
         super('Добро пожаловать');
     }
@@ -28,8 +31,8 @@ class WelcomePage extends BasePage {
      * @returns {Promise<void>}
      */
     async enterLoginAndSignIn(login) {
-        await this.loginTextBox.setValue(login);
-        await this.signInButton.click();
+        await this.#loginTextBox.setValue(login);
+        await this.#signInButton.click();
     }
 }
 
